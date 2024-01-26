@@ -3,7 +3,6 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, 
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from datetime import datetime
 
-# SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
 SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:postgres@postgres:5432/postgres'
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
