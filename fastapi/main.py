@@ -16,7 +16,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI()
 
-# Dependency to get the database session
 def get_db():
     db = SessionLocal()
     try:
@@ -24,10 +23,8 @@ def get_db():
     finally:
         db.close()
 
-# OAuth2PasswordBearer for handling token authentication
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
-# Dependency to get the current user based on the provided token
 def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=401,
@@ -41,11 +38,6 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user_id
 
-@app.get("/secure-data/")
-def get_secure_data(current_user: str = Depends(get_current_user)):
-    return {"message": "You have access to this secure data!", "username": current_user}
-
-# Sign Up endpoint
 @app.post("/sign-up/", response_model=models.UserModel)
 def sign_up(user: models.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db, user)
@@ -67,11 +59,11 @@ def sign_in(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Sess
     return {"access_token": encoded_jwt, "token_type": "bearer", "user_id":user.id}
 
 
-@app.post("/users/", response_model=models.UserModel)
+@app.post("/users/", response_model=models.UserModel, current_user: str = Depends(get_current_user))
 def create_user(user: models.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db, user)
 
-@app.get("/users/{user_id}", response_model=models.UserModel)
+@app.get("/users/{user_id}", response_model=models.UserModel, current_user: str = Depends(get_current_user))
 def read_user(user_id: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, user_id)
     if db_user is None:
@@ -79,27 +71,27 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     return db_user
 
 
-@app.get("/models/", response_model=list[models.ModelModel])
+@app.get("/models/", response_model=list[models.ModelModel], current_user: str = Depends(get_current_user))
 def read_models(db: Session = Depends(get_db)):
     return crud.read_models(db)
 
 @app.post("/models/", response_model=models.ModelModel)
-def create_model(model: models.ModelCreate, db: Session = Depends(get_db)):
+def create_model(model: models.ModelCreate, db: Session = Depends(get_db), current_user: str = Depends(get_current_user)):
     return crud.create_model(db, model)
 
 @app.post("/transactions/", response_model=models.TransactionModel)
-def create_transaction(transaction: models.TransactionCreate, db: Session = Depends(get_db)):
+def create_transaction(transaction: models.TransactionCreate, db: Session = Depends(get_db), current_user: str = Depends(get_current_user)):
     return crud.create_transaction(db, transaction)
 
 @app.get("/transactions/{user_id}", response_model=list[models.TransactionModel])
-def read_transactions_for_user(user_id: int, db: Session = Depends(get_db)):
+def read_transactions_for_user(user_id: int, db: Session = Depends(get_db), current_user: str = Depends(get_current_user)):
     return crud.read_transactions_for_user(db, user_id)
 
 @app.post("/predictions/", response_model=models.PredictionModel)
-def create_prediction(prediction: models.PredictionCreate, db: Session = Depends(get_db)):
+def create_prediction(prediction: models.PredictionCreate, db: Session = Depends(get_db), current_user: str = Depends(get_current_user)):
     return crud.create_prediction(db, prediction)
 
 @app.get("/predictions/{user_id}", response_model=list[models.PredictionModel])
-def read_predictions_for_user(user_id: int, db: Session = Depends(get_db)):
+def read_predictions_for_user(user_id: int, db: Session = Depends(get_db), current_user: str = Depends(get_current_user)):
     return crud.read_predictions_for_user(db, user_id)
 
