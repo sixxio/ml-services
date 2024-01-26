@@ -16,9 +16,6 @@ def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
 
 def verify_password(plain_password: str, hashed_password: str):
-    # Implement your password verification logic here.
-    # For example, you can use a secure password hashing library like bcrypt.
-    # For demonstration purposes, we'll use a simple comparison in this example.
     return plain_password == hashed_password
 
 def get_user(db: Session, user_id: int):
