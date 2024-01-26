@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  postgres:
+    hostname: postgres
+    image: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  fastapi:
+    hostname: fastapi
+    build:
+      context: .
+      dockerfile: ./fastapi/Dockerfile.fastapi
+    depends_on:
+      - postgres
+    ports:
+      - "9999:9999"
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: ./streamlit/Dockerfile.streamlit
+    depends_on:
+      - postgres
+    ports:
+      - "8888:8888"

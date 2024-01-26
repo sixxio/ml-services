@@ -1,0 +1,15 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY ./fastapi /app
+
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc \
+    && pip install psycopg2
+
+RUN pip install --no-cache-dir fastapi uvicorn[standard] sqlalchemy pandas jwt pydantic joblib python-multipart
+
+EXPOSE 9999
+
+CMD ["uvicorn", "main:app", "--port", "9999"]
