@@ -33,11 +33,13 @@ def predict():
                                     "output_data":'{"no":"no"}',
                                     "user_id": st.session_state.get('user_id'),
                                     "model_id": model_id
-                                 })
+                                 }, 
+                             headers={'Authorization':f'Bearer {cm.get('jwt')}'})
     return pd.read_json(json.loads(response.json()['output_data']))
 
 def get_models():
-    return requests.get(f'http://{endpoint}/models/').json()
+    return requests.get(f'http://{endpoint}/models/', 
+                          headers={'Authorization':f'Bearer {cm.get('jwt')}'}).json()
 
 def create_user():
     requests.post(f'http://{endpoint}/sign-up/',
@@ -58,21 +60,23 @@ def auth_user(cm):
 
 
 def get_balance():
-    resp = requests.get(f'http://{endpoint}/users/{st.session_state.get("user_id")}')
+    resp = requests.get(f'http://{endpoint}/users/{st.session_state.get("user_id")}', 
+                          headers={'Authorization':f'Bearer {cm.get('jwt')}'})
     return resp.json()['balance']
 
 def refill():
     requests.post(f'http://{endpoint}/transactions/', 
                   json={"amount": st.session_state.get('amount', 0),
-                        "user_id":st.session_state.get('user_id')})
-                #     }, 
-                #   headers={'Authorization':f'Bearer {cm.get('jwt')}'})
+                        "user_id":st.session_state.get('user_id')}, 
+                  headers={'Authorization':f'Bearer {cm.get('jwt')}'})
 
 def get_pred_history():
-    return requests.get(f'http://{endpoint}/predictions/{st.session_state.get('user_id')}').json()
+    return requests.get(f'http://{endpoint}/predictions/{st.session_state.get('user_id')}', 
+                          headers={'Authorization':f'Bearer {cm.get('jwt')}'}).json()
 
 def get_bill_history():
-    return requests.get(f'http://{endpoint}/transactions/{st.session_state.get('user_id')}').json()
+    return requests.get(f'http://{endpoint}/transactions/{st.session_state.get('user_id')}', 
+                          headers={'Authorization':f'Bearer {cm.get('jwt')}'}).json()
 
 if cm.get('jwt') is None:
 
