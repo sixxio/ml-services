@@ -5,7 +5,6 @@ from database import User, Model, Transaction, Prediction
 import json, pandas as pd, joblib
 
 def create_user(db: Session, user: UserCreate):
-    hash ='111'  # Hash the password (use a secure hashing library)
     db_user = User(**user.dict())
     db.add(db_user)
     db.commit()
